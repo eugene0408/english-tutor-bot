@@ -31,7 +31,6 @@ SYSTEM_PROMPT = """You are an advanced, friendly AI English Tutor. Your goal is 
 
     ### FORMATTING EXAMPLE (If there are NO mistakes):
     [Your natural response to the user's message]
-    &#8205;
     <blockquote>
     💡Natural way to say it: <b>"I'm down for that"</b> or <b>"Count me in."</b>
     </blockquote>
