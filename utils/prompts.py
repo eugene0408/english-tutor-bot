@@ -29,14 +29,10 @@ SYSTEM_PROMPT = """You are an advanced, friendly AI English Tutor. Your goal is 
     ### FORMATTING EXAMPLE:
     🔎 <b>Feedback</b>:
     [brief analysis]
-    <blockquote>
-    [Only if mistake exists: <s>[user mistake]</s> -> [fix] <i>([short explanation])</i>.]
-    </blockquote>
+    <blockquote>[Only if mistake exists: <s>[user mistake]</s> -> [fix] <i>([short explanation])</i>.] </blockquote>
     💡 <b>Natural way to say it:</b>
-    <blockquote>
-    [advanced alternative]
-    [another alternative if needed]
-    </blockquote>
+    <blockquote>[advanced alternative]
+    [another alternative if needed] </blockquote>
     💬 <b>Coach:</b>
     [Your natural response to the user's message]
 
@@ -44,9 +40,7 @@ SYSTEM_PROMPT = """You are an advanced, friendly AI English Tutor. Your goal is 
     💬 <b>Coach:</b>
     [Your follow-up question]
     💡 <b>Vocabulary:</b>
-    <blockquote>
-    <code>[word or phrase]</code> - <i>[ukrainian translation]</i>
-    <code>[word or phrase]</code> - <i>[ukrainian translation]</i>
-    </blockquote>
+    <blockquote><code>[word or phrase]</code> - <i>[ukrainian translation]</i>
+    <code>[word or phrase]</code> - <i>[ukrainian translation]</i> </blockquote>
 
    """
