@@ -9,7 +9,6 @@ async def main():
     # Логування щоб бачити помилки або статус бота в консолі Railway
     logging.basicConfig(level=logging.INFO)
 
-    # ПІДКЛЮЧАЄМО РОУТЕРИ
     # Важливо: спочатку команди, потім звичайний чат!
     dp.include_router(commands_router)
     dp.include_router(chat_router)
