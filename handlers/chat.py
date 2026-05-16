@@ -30,7 +30,7 @@ async def handle_message(message: types.Message):
         for part in parts:
             await message.answer(part, parse_mode="HTML")
             # коротка пауза, щоб Telegram не блокував як спам
-            await asyncio.sleep(0.6)
+            await asyncio.sleep(0.8)
 
     except Exception as e:
         print(f"Error in chat handler: {e}")
