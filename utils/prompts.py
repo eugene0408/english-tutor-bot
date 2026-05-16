@@ -34,14 +34,14 @@ SYSTEM_PROMPT = """You are an advanced, friendly AI English Tutor. Your goal is 
     ◻️ [advanced alternative]
     ◻️ [another alternative if needed] </blockquote>
 
-    💬 <b>Coach:</b>
+    💬 <b>Coach</b>:
     [Your natural response to the user's message]
 
     ___
-    💬 <b>Coach:</b>
+    💬 <b>Coach</b>:
     [Your follow-up question]
 
-    <blockquote>💡 <b>Target Vocabulary:</b>
+    <blockquote>💡 <b>Target Vocabulary</b>:
     ◻️ <code>[word or phrase]</code> - <i>[ukrainian translation]</i>
     ◻️ <code>[word or phrase]</code> - <i>[ukrainian translation]</i> </blockquote>
 

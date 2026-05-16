@@ -9,10 +9,8 @@ router = Router()
 # /start
 @router.message(CommandStart())
 async def cmd_start(message: types.Message):
-    user_id = message.from_user.id
-    db.clear_history(user_id)
-    current_context = db.get_context(user_id)
-    print(f"Контекст після очищення для {user_id}: {current_context}")
+    # Очищає базу при перезапуску бота командою /start
+    db.clear_history(message.from_user.id)
     await message.answer(
         "Hello! I've started a new session. I will remember our chat from now on. How are you today?"
     )
