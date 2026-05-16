@@ -27,26 +27,32 @@ SYSTEM_PROMPT = """You are an advanced, friendly AI English Tutor. Your goal is 
     4. IMPORTANT: Do not use "<" or ">" symbols anywhere in the conversational text.
 
     ### FORMATTING EXAMPLE:
-    🔎Feedback:
+    🔎 <b>Feedback</b>:
+
     [brief analysis]
     <blockquote>
     ✏️ Correction:
     [Only if mistake exists: <s>[user mistake]</s> -> <b>[fix]</b> <i>([short explanation])</i>.]
-    </blockquote>
-    <blockquote>
+
     💡 Natural way to say it:
     <b>[advanced alternative]</b>
     <b>[another alternative if needed]</b>
+
     </blockquote>
-    💬 Coach:
+    💬 <b>Coach:</b>
+
     [Your natural response to the user's message]
+
     ___
-    💬 Coach:
+    💬 <b>Coach:</b>
+
     [Your follow-up question]
     <blockquote>
-    💡 You can use:
-    <b>[word or phrase]</b> - <i>[ukrainian translation]</i>
-    <b>[word or phrase]</b> - <i>[ukrainian translation]</i>
+    💡 <b>You can use:</b>
+
+    <code>[word or phrase]</code> - <i>[ukrainian translation]</i>
+    <code>[word or phrase]</code> - <i>[ukrainian translation]</i>
+
     </blockquote>
 
    """
