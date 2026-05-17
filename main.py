@@ -6,10 +6,10 @@ from loader import bot, dp
 
 
 async def main():
-    # Логування щоб бачити помилки або статус бота в консолі Railway
+    # Логування щоб бачити помилки або статус бота в консолі
     logging.basicConfig(level=logging.INFO)
 
-    # Важливо: спочатку команди, потім звичайний чат!
+    # Важливо: спочатку команди, потім чат
     dp.include_router(commands_router)
     dp.include_router(chat_router)
 

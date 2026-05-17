@@ -4,12 +4,14 @@ from loader import groq_client
 from utils.prompts import SYSTEM_PROMPT
 
 
-async def generate_tutor_response(history: list) -> list:
+async def generate_tutor_response(
+    history: list, custom_prompt: str = SYSTEM_PROMPT
+) -> tuple:
     """
     Формує запит до AI, отримує відповідь та розбиває її на частини.
     Повертає повну відповідь для бази та список оформлених повідомлень.
     """
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}] + history
+    messages = [{"role": "system", "content": custom_prompt}] + history
 
     # Запускає groq_client в окремому потоці
     loop = asyncio.get_event_loop()
