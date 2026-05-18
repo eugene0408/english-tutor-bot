@@ -10,6 +10,9 @@ load_dotenv()
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
+CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
+CHANNEL_URL = os.getenv("CHANNEL_URL")
+
 bot = Bot(
     token=TELEGRAM_TOKEN,
     default_properties=DefaultBotProperties(parse_mode="HTML"),
