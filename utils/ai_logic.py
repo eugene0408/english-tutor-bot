@@ -18,8 +18,7 @@ async def generate_tutor_response(
     chat_completion = await loop.run_in_executor(
         None,
         lambda: groq_client.chat.completions.create(
-            messages=messages,
-            model="llama-3.3-70b-versatile",
+            messages=messages, model="llama-3.3-70b-versatile", temperature=0.8
         ),
     )
     # Відповідь AI

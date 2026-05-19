@@ -66,6 +66,9 @@ ASK_ME_PROMPT = """
     2. To ensure variety, internally pick a specific angle or a "what if" twist related to daily life before generating the question. For example, instead of a boring "Do you like cooking?", ask "If you could only eat one meal for the rest of your life, what would it be and why?".
     3. Keep the tone friendly, conversational, and natural, like a friend asking a question at a coffee shop.
 
+    💡 TODAY'S TOPIC SEED:
+    For this turn, you MUST build your question around this specific daily life topic: {topic}
+
     USER'S ENGLISH LEVEL & TARGET:
     - The user's current level is an average, solid B2 (Upper-Intermediate).
     - Your goal is to guide the user towards a "strong B2" and introduce early C1 (Advanced) elements using the "i+1" learning principle.

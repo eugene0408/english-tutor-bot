@@ -1,4 +1,5 @@
 import asyncio
+import random
 
 from aiogram import Router, types
 from aiogram.fsm.context import FSMContext
@@ -9,6 +10,22 @@ from utils.prompts import ASK_ME_PROMPT, TRANSLATOR_PROMPT
 from utils.states import TranslatorStates
 
 router = Router()
+
+# Список простих тем для кнопки 🎲 Ask Me
+EVERYDAY_TOPICS = [
+    "career and dream jobs",
+    "travel experiences and missed flights",
+    "daily morning routines and habits",
+    "movies, TV shows, or books that changed your mind",
+    "food, cooking, or worst restaurant experiences",
+    "weekend plans and perfect ways to relax",
+    "childhood memories and old friends",
+    "technology, smartphones, and social media addiction",
+    "shopping habits and impulse buys",
+    "learning new skills and dealing with frustration",
+    "pets, animals, or funny nature encounters",
+    "weather, changing seasons, and perfect vacations",
+]
 
 
 # ХЕНДЛЕР КНОПКИ "🎲 Ask Me"
@@ -24,9 +41,12 @@ async def handle_ask_me(message: types.Message):
     # отримує пустий контекст
     history = db.get_context(user_id)
 
+    chosen_topic = random.choice(EVERYDAY_TOPICS)
+    final_prompt = ASK_ME_PROMPT.format(topic=chosen_topic)
+
     try:
         full_response, parts = await generate_tutor_response(
-            history, custom_prompt=ASK_ME_PROMPT
+            history, custom_prompt=final_prompt
         )
         # Зберігає питання у базу
         db.add_message(user_id, "assistant", full_response)
