@@ -4,18 +4,25 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from dotenv import load_dotenv
 from groq import Groq
+from pydantic import BaseModel
 
+# Load data from .env file
 load_dotenv()
 
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
-CHANNEL_URL = os.getenv("CHANNEL_URL")
+class Settings(BaseModel):
+    TELEGRAM_TOKEN: str
+    GROQ_API_KEY: str
+    CHANNEL_ID: int
+    CHANNEL_URL: str
+
+
+settings = Settings.model_validate(dict(os.environ))
+
 
 bot = Bot(
-    token=TELEGRAM_TOKEN,
+    token=settings.TELEGRAM_TOKEN,
     default_properties=DefaultBotProperties(parse_mode="HTML"),
 )
 dp = Dispatcher()
-groq_client = Groq(api_key=GROQ_API_KEY)
+groq_client = Groq(api_key=settings.GROQ_API_KEY)

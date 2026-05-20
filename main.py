@@ -7,13 +7,13 @@ from middlewares.check_sub import CheckSubscriptionMiddleware
 
 
 async def main():
-    # Логування для відображення помилок та статусу бота в консолі
+    # Loging to display errors and logs in console
     logging.basicConfig(level=logging.INFO)
 
-    # Перевірка підписки
+    # Subscription check
     chat_router.message.middleware(CheckSubscriptionMiddleware())
 
-    # Важливо: спочатку команди, потім чат
+    # IMPORTANT: commands first than chat
     dp.include_router(commands_router)
     dp.include_router(chat_router)
 

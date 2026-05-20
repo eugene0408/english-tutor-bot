@@ -1,17 +1,20 @@
 import asyncio
 import random
+from typing import cast
 
 from aiogram import Router, types
 from aiogram.fsm.context import FSMContext
+from groq.types.chat import ChatCompletionMessageParam
 
 from database.db_manager import db
 from utils.ai_logic import generate_tutor_response
 from utils.prompts import ASK_ME_PROMPT, TRANSLATOR_PROMPT
 from utils.states import TranslatorStates
+from utils.user import get_user_id
 
 router = Router()
 
-# Список простих тем для кнопки 🎲 Ask Me
+# Topics list for 🎲 Ask Me button
 EVERYDAY_TOPICS = [
     "career and dream jobs",
     "travel experiences and missed flights",
@@ -28,17 +31,20 @@ EVERYDAY_TOPICS = [
 ]
 
 
-# ХЕНДЛЕР КНОПКИ "🎲 Ask Me"
+# "🎲 Ask Me" button handler
 @router.message(lambda message: message.text == "🎲 Ask Me")
 async def handle_ask_me(message: types.Message):
     """
-    Очищує базу, запускає Groq з промптом ASK_ME_PROMPT,
-    зберігає відповідь у базу та надсилає у чат
+    Clear database, launch Groq with ASK_ME_PROMPT
+    and randomly selected topic from EVERYDAY_TOPICS,
+    save response to base and send it to chat
     """
-    user_id = message.from_user.id
-    # очищує базу даних
+    user_id = get_user_id(message)
+    if user_id is None:
+        return
+    # Clear datebase for user
     db.clear_history(user_id)
-    # отримує пустий контекст
+    # get empty history
     history = db.get_context(user_id)
 
     chosen_topic = random.choice(EVERYDAY_TOPICS)
@@ -48,9 +54,9 @@ async def handle_ask_me(message: types.Message):
         full_response, parts = await generate_tutor_response(
             history, custom_prompt=final_prompt
         )
-        # Зберігає питання у базу
+        # Save AI question to base
         db.add_message(user_id, "assistant", full_response)
-        # Отримує відформатоване питання
+        # Get formated question
         ai_question = (
             parts[0]
             if parts
@@ -64,59 +70,63 @@ async def handle_ask_me(message: types.Message):
         )
 
 
-# ХЕНДЛЕР КНОПКИ "Translator 🌐"
+# "Translator 🌐" button handler
 @router.message(lambda message: message.text == "Translator 🌐")
 async def start_translation(message: types.Message, state: FSMContext):
-    # Вмикає стан очікування тексту для перекладу
+    # Set waiting for text state
     await state.set_state(TranslatorStates.waiting_for_ukrainian_text)
     await message.answer("⏬ Пишіть українською 🇺🇦 ")
 
 
-# БОТ ПЕРЕХОПЛЮЄ ТЕКСТ ДЛЯ ПЕРЕКЛАДУ (тільки коли увімкнено стан)
+# BOT CAPTURES TEXT FOR TRANSLATION (only when the state is enabled)
 @router.message(TranslatorStates.waiting_for_ukrainian_text)
 async def process_translation(message: types.Message, state: FSMContext):
     uk_text = message.text
-    # записує текст який потрібно перекласти у тимчасову історію
-    temporary_history = [{"role": "user", "content": uk_text}]
-
-    # Виклик Groq з промптом для перекладу
-    _, parts = await generate_tutor_response(
-        history=temporary_history, custom_prompt=TRANSLATOR_PROMPT
+    # Create temp history for text to translate
+    temporary_history = cast(
+        ChatCompletionMessageParam, {"role": "user", "content": uk_text}
     )
 
-    # Переклад
+    # Run Groq with TRANSLATOR_PROMPT
+    _, parts = await generate_tutor_response(
+        history=[temporary_history], custom_prompt=TRANSLATOR_PROMPT
+    )
+
+    # Translated text
     en_translation = parts[0] if parts else "Sorry, couldn't translate."
 
-    # Відправляє переклад користувачу
+    # Send translated text to chat
     await message.answer(f"<code>{en_translation}</code>", parse_mode="HTML")
 
-    # ВАЖЛИВО: скидання стану щоб бот повернувася в режим звичайного чату
+    # IMPORTANT: reset the state so the bot returns to normal chat mode
     await state.clear()
 
 
-# ЗВИЧАЙНИЙ ЧАТ
+# CHAT MODE
 @router.message()
 async def handle_message(message: types.Message):
-    user_id = message.from_user.id
+    user_id = get_user_id(message)
+    if user_id is None:
+        return
     user_text = message.text
 
-    # Зберігаємо повідомлення користувача
+    # Save user message
     db.add_message(user_id, "user", user_text)
 
-    # Отримуємо історію для передачі AI
+    # Get history for AI
     history = db.get_context(user_id)
 
     try:
-        # Викликаємо логіку AI
+        # Run AI logic
         full_response, parts = await generate_tutor_response(history)
 
-        # Зберігаємо повну відповідь бота в базу для контексту
+        # Save full response for AI context
         db.add_message(user_id, "assistant", full_response)
 
-        # Надсилаємо кожну частину окремим повідомленням у Telegram
+        # Send each part in separate message to Telegram chat
         for part in parts:
             await message.answer(part, parse_mode="HTML")
-            # коротка пауза, щоб Telegram не блокував як спам
+            # short break so Telegram doest block it as spam
             await asyncio.sleep(0.8)
 
     except Exception as e:
