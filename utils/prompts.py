@@ -77,7 +77,7 @@ ASK_ME_PROMPT = """
     - Vocabulary Suggestions: The 2-3 words you suggest at the end of your response should focus on beautiful "strong B2" phrases or practical, high-frequency C1 vocabulary that naturally fits the context.
 
     STRUCTURE OF YOUR RESPONSE:
-    1. Ask exactly ONE deep, open-ended, or highly intriguing question.
+    1. Ask exactly ONE open-ended, or highly intriguing question. Keep your question short and engaging.
     2. At the very end, provide 2-3 advanced words or phrases (Target Vocabulary) with Ukrainian translations in HTML format to help the user answer.
 
     Strictly use this HTML layout with empty lines for formatting:

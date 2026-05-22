@@ -14,10 +14,11 @@ class CheckSubscriptionMiddleware(BaseMiddleware):
         event: TelegramObject,
         data: Dict[str, Any],
     ) -> Any:
-        # Skip check any other event except Message
+        # Skip checking any other event except Message
+        # In this bot user can send only messages, menu buttons send simple text messages too
         if not isinstance(event, Message):
             return await handler(event, data)
-        # Skip check command /start, so user can see greeting message
+        # Skip checking command /start, so user can see greeting message
         if event.text and event.text.startswith("/start"):
             return await handler(event, data)
 
@@ -28,7 +29,7 @@ class CheckSubscriptionMiddleware(BaseMiddleware):
             member = await bot.get_chat_member(
                 chat_id=settings.CHANNEL_ID, user_id=event.from_user.id
             )
-            # left or kicked means user is not subscripted
+            # Status left or kicked means user is not subscripted
             if member.status in ["left", "kicked"]:
                 raise ValueError()  # Artificially induce an error to enter the access control unit
 
