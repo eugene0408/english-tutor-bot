@@ -15,6 +15,7 @@ class Settings(BaseModel):
     GROQ_API_KEY: str
     CHANNEL_ID: int
     CHANNEL_URL: str
+    MINI_APP_URL: str
 
 
 settings = Settings.model_validate(dict(os.environ))

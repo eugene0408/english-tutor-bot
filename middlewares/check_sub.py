@@ -15,8 +15,9 @@ class CheckSubscriptionMiddleware(BaseMiddleware):
         data: Dict[str, Any],
     ) -> Any:
         # Skip checking any other event except Message
-        # In this bot user can send only messages, menu buttons send simple text messages too
         if not isinstance(event, Message):
+            return await handler(event, data)
+        if event.web_app_data is not None:
             return await handler(event, data)
         # Skip checking command /start, so user can see greeting message
         if event.text and event.text.startswith("/start"):
@@ -31,28 +32,29 @@ class CheckSubscriptionMiddleware(BaseMiddleware):
             )
             # Status left or kicked means user is not subscripted
             if member.status in ["left", "kicked"]:
-                raise ValueError()  # Artificially induce an error to enter the access control unit
+                keyboard = InlineKeyboardMarkup(
+                    inline_keyboard=[
+                        [
+                            InlineKeyboardButton(
+                                text="📢 Subscribe to Channel", url=settings.CHANNEL_URL
+                            )
+                        ]
+                    ]
+                )
+
+                await event.answer(
+                    "⚠️ <b>Access Denied!</b>\n\n"
+                    "To use this English tutor bot, you must be subscribed to channel. ",
+                    parse_mode="HTML",
+                    reply_markup=keyboard,
+                )
+                # Return None
+                return
 
             # If user is subscripted (member, administrator, creator), continue handler
             return await handler(event, data)
 
-        except Exception:
-            # If no subscription block handler and send subscription button
-            keybord = InlineKeyboardMarkup(
-                inline_keyboard=[
-                    [
-                        InlineKeyboardButton(
-                            text="📢 Subscribe to Channel", url=settings.CHANNEL_URL
-                        )
-                    ]
-                ]
-            )
-
-            await event.answer(
-                "⚠️ <b>Access Denied!</b>\n\n"
-                "To use this English tutor bot, you must be subscribed to channel. ",
-                parse_mode="HTML",
-                reply_markup=keybord,
-            )
-            # Return None
-            return
+        except Exception as e:
+            print(f"Subscription check error: {e}")
+            # continue handler if checking error
+            return await handler(event, data)

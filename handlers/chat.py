@@ -2,42 +2,54 @@ import asyncio
 import random
 from typing import cast
 
-from aiogram import Router, types
+from aiogram import Bot, F, Router, types
 from aiogram.fsm.context import FSMContext
 from groq.types.chat import ChatCompletionMessageParam
 
 from database.db_manager import db
 from utils.ai_logic import generate_tutor_response
 from utils.constants import EVERYDAY_TOPICS
-from utils.prompts import ASK_ME_PROMPT, TRANSLATOR_PROMPT
+from utils.prompts import ASK_ME_PROMPT, SYSTEM_PROMPT, TRANSLATOR_PROMPT
 from utils.states import TranslatorStates
 from utils.user import get_user_id
 
 router = Router()
 
 
-# "🎲 Ask Me" button handler
-@router.message(lambda message: message.text == "🎲 Ask Me")
-async def handle_ask_me(message: types.Message):
+# Get level & temp settings from database
+def get_level_and_temp(user_id: int) -> tuple[str, float]:
+    settings = db.get_user_settings(user_id)
+    return settings["level"], settings["temperature"]
+
+
+# =================================================
+# MINI APP BUTTONS HANDLERS
+# =================================================
+
+
+async def trigger_random_question(user_id: int, bot: Bot):
     """
     Clear database, launch Groq with ASK_ME_PROMPT
     and randomly selected topic from EVERYDAY_TOPICS,
     save response to base and send it to chat
     """
-    user_id = get_user_id(message)
-    if user_id is None:
-        return
-    # Clear datebase for user
+    # Clear datebase for user (to start new topic chat)
     db.clear_history(user_id)
     # get empty history
     history = db.get_context(user_id)
 
     chosen_topic = random.choice(EVERYDAY_TOPICS)
+
+    user_level, user_temperature = get_level_and_temp(user_id)
+
     final_prompt = ASK_ME_PROMPT.format(topic=chosen_topic)
 
     try:
         full_response, parts = await generate_tutor_response(
-            history, custom_prompt=final_prompt
+            history,
+            custom_prompt=final_prompt,
+            level=user_level,
+            temperature=user_temperature,
         )
         # Save AI question to base
         db.add_message(user_id, "assistant", full_response)
@@ -47,23 +59,25 @@ async def handle_ask_me(message: types.Message):
             if parts
             else "I'm sorry, I couldn't think of a question. Please try again."
         )
-        await message.answer(ai_question, parse_mode="HTML")
+        await bot.send_message(chat_id=user_id, text=ai_question, parse_mode="HTML")
     except Exception as e:
-        print(f"Error in ask handler: {e}")
-        await message.answer(
-            "I'm sorry, I couldn't think of a question. Please try again."
+        print(f"Error in trigger_random_question: {e}")
+        await bot.send_message(
+            chat_id=user_id,
+            text="I'm sorry, I couldn't think of a question. Please try again.",
         )
 
 
-# "Translator 🌐" button handler
-@router.message(lambda message: message.text == "Translator 🌐")
-async def start_translation(message: types.Message, state: FSMContext):
+async def process_translator_mode(user_id: int, bot: Bot, state: FSMContext):
     # Set waiting for text state
     await state.set_state(TranslatorStates.waiting_for_ukrainian_text)
-    await message.answer("⏬ Пишіть українською 🇺🇦 ")
+    await bot.send_message(chat_id=user_id, text="⏬ Пишіть українською 🇺🇦 ")
 
 
+# ================================================================
+# TRANSLATION PROCESSING
 # BOT CAPTURES TEXT FOR TRANSLATION (only when the state is enabled)
+# ================================================================
 @router.message(TranslatorStates.waiting_for_ukrainian_text)
 async def process_translation(message: types.Message, state: FSMContext):
     uk_text = message.text
@@ -72,24 +86,32 @@ async def process_translation(message: types.Message, state: FSMContext):
         ChatCompletionMessageParam, {"role": "user", "content": uk_text}
     )
 
-    # Run Groq with TRANSLATOR_PROMPT
+    # Run Groq with TRANSLATOR_PROMPT & to NOT include user LEVEL_PROMPT here append_level=False
     _, parts = await generate_tutor_response(
-        history=[temporary_history], custom_prompt=TRANSLATOR_PROMPT
+        history=[temporary_history], custom_prompt=TRANSLATOR_PROMPT, append_level=False
     )
 
     # Translated text
     en_translation = parts[0] if parts else "Sorry, couldn't translate."
 
     # Send translated text to chat
-    await message.answer(f"<code>{en_translation}</code>", parse_mode="HTML")
+    await message.answer(
+        f"🌐Переклад: \n <code>{en_translation}</code>", parse_mode="HTML"
+    )
 
     # IMPORTANT: reset the state so the bot returns to normal chat mode
     await state.clear()
 
 
-# CHAT MODE
+# =====================================
+# REGULAR CHAT MODE
+# =====================================
 @router.message()
 async def handle_message(message: types.Message):
+    # ignore web app messages
+    if message.web_app_data is not None:
+        return
+
     user_id = get_user_id(message)
     if user_id is None:
         return
@@ -101,9 +123,16 @@ async def handle_message(message: types.Message):
     # Get history for AI
     history = db.get_context(user_id)
 
+    user_level, user_temperature = get_level_and_temp(user_id)
+
     try:
         # Run AI logic
-        full_response, parts = await generate_tutor_response(history)
+        full_response, parts = await generate_tutor_response(
+            history,
+            custom_prompt=SYSTEM_PROMPT,
+            level=user_level,
+            temperature=user_temperature,
+        )
 
         # Save full response for AI context
         db.add_message(user_id, "assistant", full_response)

@@ -4,18 +4,28 @@ from typing import cast
 from groq.types.chat import ChatCompletionMessageParam
 
 from loader import groq_client
-from utils.prompts import SYSTEM_PROMPT
+from utils.prompts import LEVEL_PROMPT, SYSTEM_PROMPT
 
 
 async def generate_tutor_response(
-    history: list[ChatCompletionMessageParam], custom_prompt: str = SYSTEM_PROMPT
+    history: list[ChatCompletionMessageParam],
+    custom_prompt: str = SYSTEM_PROMPT,
+    level: str = "B2",
+    temperature: float = 0.8,
+    append_level: bool = True,
 ) -> tuple:
     """
     Forms a request to the AI, receives a response and breaks it into parts.
     Returns the full response to the database and a list of formatted messages.
     """
+    if append_level:
+        level_prompt = LEVEL_PROMPT.format(level=level)
+        final_prompt = custom_prompt + level_prompt
+    else:
+        final_prompt = custom_prompt
+
     system_message = cast(
-        ChatCompletionMessageParam, {"role": "system", "content": custom_prompt}
+        ChatCompletionMessageParam, {"role": "system", "content": final_prompt}
     )
     messages: list[ChatCompletionMessageParam] = [system_message] + history
 
@@ -24,7 +34,7 @@ async def generate_tutor_response(
     chat_completion = await loop.run_in_executor(
         None,
         lambda: groq_client.chat.completions.create(
-            messages=messages, model="llama-3.3-70b-versatile", temperature=0.8
+            messages=messages, model="llama-3.3-70b-versatile", temperature=temperature
         ),
     )
     # AI response of empty string if no response
