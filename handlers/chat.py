@@ -9,7 +9,12 @@ from groq.types.chat import ChatCompletionMessageParam
 from database.db_manager import db
 from utils.ai_logic import generate_tutor_response
 from utils.constants import EVERYDAY_TOPICS
-from utils.prompts import ASK_ME_PROMPT, SYSTEM_PROMPT, TRANSLATOR_PROMPT
+from utils.prompts import (
+    ASK_ME_PROMPT,
+    SYSTEM_PROMPT,
+    TRANSLATOR_PROMPT,
+    VOCABULARY_RULES,
+)
 from utils.states import TranslatorStates
 from utils.user import get_user_id
 
@@ -42,7 +47,9 @@ async def trigger_random_question(user_id: int, bot: Bot):
 
     user_level, user_temperature = get_level_and_temp(user_id)
 
-    final_prompt = ASK_ME_PROMPT.format(topic=chosen_topic)
+    final_prompt = ASK_ME_PROMPT.format(
+        topic=chosen_topic, vocab_rules=VOCABULARY_RULES
+    )
 
     try:
         full_response, parts = await generate_tutor_response(
@@ -125,11 +132,13 @@ async def handle_message(message: types.Message):
 
     user_level, user_temperature = get_level_and_temp(user_id)
 
+    final_prompt = SYSTEM_PROMPT.format(vocab_rules=VOCABULARY_RULES)
+
     try:
         # Run AI logic
         full_response, parts = await generate_tutor_response(
             history,
-            custom_prompt=SYSTEM_PROMPT,
+            custom_prompt=final_prompt,
             level=user_level,
             temperature=user_temperature,
         )
