@@ -8,7 +8,7 @@ from groq.types.chat import ChatCompletionMessageParam
 
 from database.db_manager import db
 from utils.ai_logic import generate_tutor_response
-from utils.constants import EVERYDAY_TOPICS
+from utils.constants import EVERYDAY_TOPICS, QUESTION_STYLES, TONES
 from utils.prompts import (
     ASK_ME_PROMPT,
     SYSTEM_PROMPT,
@@ -44,11 +44,16 @@ async def trigger_random_question(user_id: int, bot: Bot):
     history = db.get_context(user_id)
 
     chosen_topic = random.choice(EVERYDAY_TOPICS)
+    chosen_style = random.choice(QUESTION_STYLES)
+    chosen_tone = random.choice(TONES)
 
     user_level, user_temperature = get_level_and_temp(user_id)
 
     final_prompt = ASK_ME_PROMPT.format(
-        topic=chosen_topic, vocab_rules=VOCABULARY_RULES
+        topic=chosen_topic,
+        style=chosen_style,
+        tone=chosen_tone,
+        vocab_rules=VOCABULARY_RULES,
     )
 
     try:
