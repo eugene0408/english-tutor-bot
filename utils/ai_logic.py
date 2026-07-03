@@ -41,8 +41,8 @@ async def generate_tutor_response(
     full_response = chat_completion.choices[0].message.content or ""
     # Inserts invisible characters to preserve paragraphs in Telegram chat
     formated_response = full_response.replace("\n\n", "\n\u200e\n")
-    # Splits the answer into parts by separator ___
-    parts = formated_response.split("___")
+    # Splits the answer into parts by separator
+    parts = formated_response.split("§§SPLIT§§")
     # Remove empty parts and extra spaces
     clean_parts = [part.strip() for part in parts if part.strip]
 
