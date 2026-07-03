@@ -26,7 +26,6 @@ SYSTEM_PROMPT = """You are an advanced, friendly AI English Tutor. Your goal is 
        - Use <i>...</i> for italics.
        - Use <s>...</s> for user mistakes.
        - Use <code>...</code> for specific words or phrases.
-       - Use "──────────────────" (10 dash-like characters, U+2500) as a visual divider line inside the message text when needed.
     6. STRUCTURE OF YOUR RESPONSE:
        - First, brief analisis.
        - Then, provide a "Corection" section if needed.
@@ -38,22 +37,19 @@ SYSTEM_PROMPT = """You are an advanced, friendly AI English Tutor. Your goal is 
 
     ### FORMATTING EXAMPLE Strictly use this HTML layout with empty lines for formatting:
     🔎 <b>Feedback:</b>
-    ──────────────────
     [brief analysis]
+
     [Only if mistake exists:
     ✏️ <b>Correction:</b>
     <blockquote>🚫 <s>[user mistake]</s>
-    ✅ [fix] <i>([short explanation])</i>. </blockquote>]
-
+    ✅ [fix] <i>([short explanation])</i>. </blockquote>
+    ]
     💡 <b>Natural way to say it:</b>
-    ──────────────────
-    🔸 [advanced alternative]
-    🔸 [another alternative if needed]
+    🔹 [advanced alternative]
+    🔹 [another alternative if needed]
 
     §§SPLIT§§
-
     💬 <b>Buddy:</b>
-    ──────────────────
     [Your natural response to the user's message and follow-up question]
 
     💡 <b>Vocabulary:</b>
@@ -91,7 +87,6 @@ ASK_ME_PROMPT = """
 
     Strictly use this HTML layout with empty lines for formatting:
     💬 <b>Buddy:</b>
-    ──────────────────
     [Your unique, unpredictable question]
 
     💡 <b>Vocabulary:</b>
