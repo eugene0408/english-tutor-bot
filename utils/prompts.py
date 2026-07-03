@@ -37,7 +37,7 @@ SYSTEM_PROMPT = """You are an advanced, friendly AI English Tutor. Your goal is 
     7. IMPORTANT: Do not use "<" or ">" symbols anywhere in the conversational text.
 
     ### FORMATTING EXAMPLE Strictly use this HTML layout with empty lines for formatting:
-    🔎 <b>Feedback</b>:
+    🔎 <b>Feedback:</b>
     ──────────────────────────────
     [brief analysis]
     [Only if mistake exists:
@@ -52,11 +52,11 @@ SYSTEM_PROMPT = """You are an advanced, friendly AI English Tutor. Your goal is 
 
     §§SPLIT§§
 
-    💬 <b>Buddy</b>:
+    💬 <b>Buddy:</b>
     ──────────────────────────────
     [Your natural response to the user's message and follow-up question]
 
-    💡 <b>Vocabulary</b>:
+    💡 <b>Vocabulary:</b>
     <blockquote>🔸 <code>[word or phrase]</code> - <i>[ukrainian translation]</i>
     🔸 <code>[word or phrase]</code> - <i>[ukrainian translation]</i> </blockquote>
 
@@ -90,11 +90,12 @@ ASK_ME_PROMPT = """
       {vocab_rules}
 
     Strictly use this HTML layout with empty lines for formatting:
-    💬 <b>Buddy</b>:
+    💬 <b>Buddy:</b>
+    ──────────────────────────────
     [Your unique, unpredictable question]
 
-    <blockquote>💡 <b>Vocabulary</b>:
-    🔸 <code>[word or phrase]</code> - <i>[ukrainian translation]</i>
+    💡 <b>Vocabulary:</b>
+    <blockquote>🔸 <code>[word or phrase]</code> - <i>[ukrainian translation]</i>
     🔸 <code>[word or phrase]</code> - <i>[ukrainian translation]</i> </blockquote>
 
 """
